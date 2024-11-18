@@ -7,8 +7,11 @@ Once this package is ready, it will be turned into a PR to Transducers.jl, but f
 Please see https://www.youtube.com/watch?v=OFw1Cu220eA for a simple overview of what transducers are, the current state of the Transducers ecosystem, and what we'd like to see happen in the near future with Transducers.jl
 
 ``` julia
+julia> fold(+, Filter(iseven) ⨟ Map(sin), 1:1000; executor=ThreadEx(n=8))
+0.5539363521120523
+
 julia> 1:1000 |> Filter(iseven) |> Map(sin) |> fold(+; executor=ThreadEx(n=8))
-0.1524949315177535
+0.5539363521120523
 ```
 
 ## Major changes in TransducersNext.jl relative to Transducers.jl
