@@ -48,11 +48,11 @@ equivalent to
 ``` julia
 acc = init
 for x in v
-	if iseven(x)
-	    acc = acc + sin(x)
-	else
-		acc = acc
-	end
+    if iseven(x)
+        acc = acc + sin(x)
+    else
+        acc = acc
+    end
 end
 ```
 which is more efficient than an equivalent `Iterator` based approach. 
@@ -99,8 +99,8 @@ where `@unroll 8` says "manually peel out the first 8 iterations" (this is here 
 ### inside @next
 val = next(rf, state, x) # next usually just does `rf(state, x)`
 if val isa Finished # this is for early termination
-	return val # break out of the `for` loop
+    return val # break out of the `for` loop
 else
-	val
+    val
 end
 ```
