@@ -21,7 +21,7 @@ julia> 1:1000 |> Filter(iseven) |> Map(sin) |> fold(+; executor=ThreadEx(n=8))
 + Multithreading is more performant and type inferrable
   + however, early termination is less mature than upstream
 + The implementation of `__foldl__` (now `__fold__`) is significantly simpler, and often more performant. We have a `foldstyle` trait for opting into certain classes of fold behaviour.
-  + currently only `RecursiveFold` for `Tuple`/`NamedTuple`  and `RecursiveFold` for everything else. Traits might not be necessary here, I originally had a third trait for things which should use linear indexing but that's no longer needed, so perhaps this can just be a regular dispatch.
+  + currently only `RecursiveFold` for `Tuple`/`NamedTuple`  and `IterateFold` for everything else. Traits might not be necessary here, I originally had a third trait for things which should use linear indexing but that's no longer needed, so perhaps this can just be a regular dispatch.
 + Don't yet support completion of stateful transducers
 + Don't yet have a `collect` / `tcollect` equivalent
 + Currently only supporting a very small subset of `Transducer`s from the original library (currently we have `Map`, `Filter`, `Cat`, and `TerminateIf`).
