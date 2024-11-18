@@ -17,6 +17,7 @@ julia> 1:1000 |> Filter(iseven) |> Map(sin) |> fold(+; executor=ThreadEx(n=8))
 ## Major changes in TransducersNext.jl relative to Transducers.jl
 
 + `foldxl`, `foldxt`, `foldxd`, etc. have been replaced with `fold`. Choosing threads, SIMD, or other backends (no other ones yet supported) is done with an `executor` argument, e.g. `fold(+, Map(sin), v; executor=ThreadsEx(;n=8))`
+  + Executors support nesting. For example, `ThreadsEx` holds an inner executor. The idea here is that you might want to say "first split up the reduction across distributed processes, then split those sub-reductions up onto different threads on those processes, and then do SIMD reductions for the sub-sub-reductions"
 + Multithreading is more performant and type inferrable
   + however, early termination is less mature than upstream
 + The implementation of `__foldl__` (now `__fold__`) is significantly simpler, and often more performant. We have a `foldstyle` trait for opting into certain classes of fold behaviour.
@@ -28,3 +29,5 @@ julia> 1:1000 |> Filter(iseven) |> Map(sin) |> fold(+; executor=ThreadEx(n=8))
 ## Open design questions
 
 see https://github.com/JuliaFolds2/TransducersNext.jl/issues?q=is%3Aissue+is%3Aopen+label%3A%22design+question%22
+
+Please open new issues if you have design questions or ideas of your own.
