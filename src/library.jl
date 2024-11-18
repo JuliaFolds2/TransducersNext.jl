@@ -69,21 +69,20 @@ upstream transducer.
 
 # Examples
 ```jldoctest
-julia> using Transducers
-
-julia> foldl((l, r) -> r, TerminateIf(x -> x == 3), 1:10)
+julia> 1:10 |> TerminateIf(x -> x == 3) |> fold((l,r) -> r)
 3
 ```
 """
-struct ReduceIf{P} <: AbstractFilter
+struct TerminateIf{P} <: AbstractFilter
     pred::P
 end
 
-function next(rf::R_{ReduceIf}, result0, input)
+function next(rf::R_{TerminateIf}, result0, input)
     shouldterminate = xform(rf).pred(input)
     result = next(inner(rf), result0, input)
     if shouldterminate
-        return terminated(complete(inner(rf), result))
+        return finished(result)
+        #return finished(complete(inner(rf), result))
     end
     return result
 end

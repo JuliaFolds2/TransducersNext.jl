@@ -45,6 +45,8 @@ include("utils.jl")
 @public __fold__, foldstyle, FoldStyle, IterateFold, RecursiveFold
 @public Reduction, Transducer, Composition
 @public reduction, reducingfunction
+@public Finished, isfinished, finished, value, var"@return_if_finished"
+@public next, var"@next", combine, inner, xform, start
 
 include("core.jl")
 include("library.jl")
