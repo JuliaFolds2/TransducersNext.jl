@@ -24,3 +24,7 @@ julia> 1:1000 |> Filter(iseven) |> Map(sin) |> fold(+; executor=ThreadEx(n=8))
 + Don't yet support completion of stateful transducers
 + Don't yet have a `collect` / `tcollect` equivalent
 + Currently only supporting a very small subset of `Transducer`s from the original library (currently we have `Map`, `Filter`, `Cat`, and `TerminateIf`).
+
+## Open design questions
+
+see https://github.com/JuliaFolds2/TransducersNext.jl/issues?q=is%3Aissue+is%3Aopen+label%3A%22design+question%22
