@@ -3,6 +3,8 @@
 abstract type Transducer end
 abstract type AbstractFilter <: Transducer end
 
+Base.:(&)(xf1::Transducer, xf2::Transducer) = xf1 ⨟ xf2
+
 struct Composition{XO <: Transducer, XI <: Transducer} <: Transducer
     outer::XO
     inner::XI
@@ -17,16 +19,16 @@ Base.broadcastable(xf::Transducer) = Ref(xf)
 
 #-----------------------------------------------------------------
 
-@inline next(f, result, input) = _next(f, result, input)
-@inline _next(f, result, input) = f(result, input)
+@inline next(f::F, result, input)  where {F} = _next(f, result, input)
+@inline _next(f::F, result, input) where {F} = f(result, input)
 
 abstract type AbstractReduction{innertype} <: Function end
 @inline (rf::AbstractReduction)(state, input) = next(rf, state, input)
 InnerType(::Type{<:AbstractReduction{T}}) where T = T
 ConstructionBase.constructorof(::Type{T}) where {T <: AbstractReduction} = T
 
-inner(rf::AbstractReduction) = rf.inner
-xform(rf::AbstractReduction) = rf.xform
+inner(rf::R) where {R <: AbstractReduction} = rf.inner
+xform(rf::R) where {R <: AbstractReduction} = rf.xform
 has(rf::AbstractReduction, T::Type{<:Transducer}) = has(Transducer(rf), T)
 
 struct BottomRF{F} <: AbstractReduction{F}
@@ -37,7 +39,7 @@ ensurerf(rf::AbstractReduction) = rf
 ensurerf(f) = BottomRF(f)
 
 start(rf::BottomRF, result) = start(inner(rf), result)
-@inline next(rf::BottomRF, result, input) = next(inner(rf), result, input)
+@inline next(rf::BottomRF{F}, result, input) where {F} = next(inner(rf), result, input)
 
 # @inline completebasecase(rf::BottomRF, result) = completebasecase(inner(rf), result)
 # complete(rf::BottomRF, result) = complete(inner(rf), result)

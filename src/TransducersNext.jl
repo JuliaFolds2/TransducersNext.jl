@@ -10,19 +10,19 @@ Once this package is ready, it will be turned into a PR to Transducers.jl, but f
 =#
 
 
-using StableTasks: StableTasks, @spawn
+using StableTasks: StableTasks, @spawn, @spawnat
 using ConstructionBase: ConstructionBase
 using CompositionsBase: CompositionsBase, ⨟, opcompose
-using ChunkSplitters: ChunkSplitters, chunks
+using ChunkSplitters: ChunkSplitters, chunks, index_chunks, Consecutive, RoundRobin
 
-# using BangBang:
-#     @!, BangBang, Empty, append!!, collector, empty!!, finish!, push!!, setindex!!, union!!
+using BangBang:
+    @!, BangBang, Empty, append!!, collector, empty!!, finish!, push!!, setindex!!, union!!
 
-# using MicroCollections: MicroCollections, UndefVector, UndefArray
-
+using MicroCollections: MicroCollections, UndefVector, UndefArray
 
 using InitialValues: InitialValue
 using .Base.Broadcast: Broadcast, Broadcasted, instantiate
+using .Base: IteratorSize, SizeUnknown, HasLength, HasShape
 
 front(x) = Base.front(x)
 tail(x) = Base.tail(x)
@@ -35,8 +35,11 @@ function inner end
 function xform end
 function start end
 
+function foldstyle end
+
+
 export fold, Map, Filter, TerminateIf, Cat
-export SequentialEx, SIMDEx, ThreadEx
+export SequentialEx, SIMDEx, ChunkedEx, ThreadEx, DistributedEx
 export (⨟)
 
 
@@ -46,7 +49,7 @@ include("utils.jl")
 @public Reduction, Transducer, Composition
 @public reduction, reducingfunction
 @public Finished, isfinished, finished, value, var"@return_if_finished"
-@public next, var"@next", combine, inner, xform, start
+@public next, var"@next", combine, inner, xform, start, transduce
 
 include("core.jl")
 include("library.jl")
@@ -54,6 +57,8 @@ include("eduction.jl")
 include("executors.jl")
 include("fold.jl")
 include("threadfold.jl")
+include("interop.jl")
+include("show.jl")
 
 
 

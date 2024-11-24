@@ -1,8 +1,21 @@
-function __fold__(rf0::RF, init::T, itr, ex::ThreadEx) where {RF, T}
+module DistributedExt
+
+using Distributed: Distributed, @spawn, fetch, nprocs
+using ChunkSplitters: ChunkSplitters, index_chunks
+using TransducersNext:
+    TransducersNext,
+    __fold__,
+    @next,
+    DistributedEx, 
+    @return_if_finished,
+    Map,
+    combine
+
+function TransducersNext.__fold__(rf0::RF, init::T, itr, ex::DistributedEx) where {RF, T}
     (;nchunks, split, minsize) = ex
     if length(itr) <= minsize
         return __fold__(rf0, init, itr, ex.inner_ex)
-    end    
+    end
     tasks = map(index_chunks(itr; n=ex.nchunks, split, minsize)) do inds
         @spawn  begin
             @inline getvalue(I) = @inbounds itr[I]
@@ -11,13 +24,6 @@ function __fold__(rf0::RF, init::T, itr, ex::ThreadEx) where {RF, T}
         end
     end
     
-    # # this is equivalent to
-    # fold(tasks) do ta, tb
-    #     a = @return_if_finished fetch(ta)
-    #     b = @return_if_finished fetch(tb)
-    #     combine(rf, a, b)
-    # end
-    # but the above fold does not infer well, whereas the iterative peel does.
     let (task, rest) = Iterators.peel(tasks)
         result = @return_if_finished fetch(task)
         for task in rest
@@ -30,3 +36,7 @@ function __fold__(rf0::RF, init::T, itr, ex::ThreadEx) where {RF, T}
     # encounters a `Finished`. In this current setup, we might have `tasks[100]` finish early but end up needing to
     # wait for tasks[1] to finish.
 end
+
+TransducersNext.get_nprocs() = nprocs()
+
+end # module DistributedExt

@@ -55,6 +55,22 @@ function __fold__(::RecursiveFold, rf::RF, val::T, itr::Itr, ex::Union{Sequentia
     end
 end
 
+function __fold__(rf0::RF, init::T, itr, ex::ChunkedEx) where {RF, T}
+    (;nchunks, split, minsize) = ex
+    if length(itr) <= minsize
+        return __fold__(rf0, init, itr, ex.inner_ex)
+    end
+    xf = Map() do inds
+        @inline getvalue(I) = @inbounds itr[I]
+        rf = Map(getvalue)'(rf0)
+        __fold__(rf, init, inds, ex.inner_ex)
+    end
+    rf_outer = xf'((l, r) -> combine(rf0, l, r))
+    __fold__(rf_outer, init, index_chunks(itr; n=nchunks, split, minsize), SequentialEx())
+end
+
+
+
 #----------------------------------------------------------------
 # Error stuff
 struct EmptyResultError <: Exception
