@@ -1,0 +1,5 @@
+[deps]
+ChunkSplitters = "ae650224-84b6-46f8-82ea-d812ca08434e"
+Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
