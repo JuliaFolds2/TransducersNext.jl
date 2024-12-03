@@ -177,6 +177,3 @@ DistributedEx(inner_ex; kwargs...) = DistributedEx(;inner_ex, kwargs...)
 
 # this is a function stub that will get a method added to it when Distributed.jl is loaded
 function get_nprocs end
-
-
-struct TurboEx <: Executor end

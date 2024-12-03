@@ -113,3 +113,20 @@ end
     rf0, itr0 = retransform(inner(rf), asfoldable(x))
     return __fold__(rf0, acc, itr0, SequentialEx())
 end
+
+
+struct Count{T} <: Transducer
+    start::T
+    step::T
+end
+Count(start = 1) = Count(start, oneunit(start))
+
+OutputSize(::Type{<:Count}) = SizeStable()
+start(rf::R_{Count}, result) = wrap(rf, xform(rf).start, start(inner(rf), result))
+complete(rf::R_{Count}, result) = complete(inner(rf), unwrap(rf, result)[2])
+
+@inline function next(rf::R_{Count}, result, ::Any)
+    wrapping(rf, result) do istate, iresult
+        return istate + xform(rf).step, next(inner(rf), iresult, istate)
+    end
+end

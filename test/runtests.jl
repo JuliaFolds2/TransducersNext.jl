@@ -1,12 +1,30 @@
-using Distributed
-addprocs(2)
-@everywhere using TransducersNext
 using TransducersNext
 using Test
 using ChunkSplitters
 
-@testset "basic smoketests" begin
+@testset "Transducer library" begin
+    @testset "Map" begin
+        @test fold(+, Map(sin), 1:10) ≈ sum(sin.(1:10))
+    end
+
+    @testset "Filter" begin
+        @test fold(+, Filter(iseven), 1:10) ≈ sum(2:2:10)
+    end
+
+    @testset "TerminateIf" begin
+        @test fold(+, TerminateIf(==(5)), 1:1000000) == sum(1:5)
+    end
     
+    @testset "Count" begin
+        @test fold(+, Count(), zeros(10)) == sum(1:10)
+    end
+end
+
+using Distributed
+addprocs(2)
+@everywhere using TransducersNext
+
+@testset "Exectutors" begin
     # Do some reduction
     f = sin
     op = (+)

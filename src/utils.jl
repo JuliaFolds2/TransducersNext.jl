@@ -95,3 +95,33 @@ macro public(ex)
     end
 end
 
+
+#-----------------------------------------------------------------
+
+"""
+    right([l, ]r) -> r
+
+It is simply defined as
+
+```julia
+right(l, r) = r
+right(r) = r
+```
+
+This function is meant to be used as `step` argument for
+[`foldl`](@ref) etc. for extracting the last output of the
+transducers.
+
+# Examples
+```jldoctest
+julia> using Transducers
+
+julia> foldl(right, Take(5), 1:10)
+5
+
+julia> foldl(right, Drop(5), 1:3; init=0)  # using `init` as the default value
+0
+```
+"""
+right(l, r) = r
+right(r) = r

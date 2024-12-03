@@ -23,6 +23,8 @@ using MicroCollections: MicroCollections, UndefVector, UndefArray
 using InitialValues: InitialValue
 using .Base.Broadcast: Broadcast, Broadcasted, instantiate
 using .Base: IteratorSize, SizeUnknown, HasLength, HasShape
+using Accessors: @set
+
 
 front(x) = Base.front(x)
 tail(x) = Base.tail(x)
@@ -37,10 +39,9 @@ function start end
 
 function foldstyle end
 
-
-export fold, Map, Filter, TerminateIf, Cat
+export fold, Map, Filter, TerminateIf, Cat, Count
 export SequentialEx, SIMDEx, ChunkedEx, ThreadEx, DistributedEx
-export (⨟)
+export (⨟), right
 
 
 include("utils.jl")
@@ -51,12 +52,16 @@ include("utils.jl")
 @public Finished, isfinished, finished, value, var"@return_if_finished"
 @public next, var"@next", combine, inner, xform, start, transduce
 
-include("core.jl")
+include("coretypes.jl")
+include("transducer.jl")
+include("reduction.jl")
+include("state_handling.jl")
 include("library.jl")
 include("eduction.jl")
 include("executors.jl")
 include("fold.jl")
 include("threadfold.jl")
+include("foldable.jl")
 include("interop.jl")
 include("show.jl")
 

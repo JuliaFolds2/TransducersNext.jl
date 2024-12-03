@@ -31,7 +31,7 @@ function __fold__(::IterateFold, rf::RF, init::T, itr, ::SequentialEx) where {RF
     @unroll 8 for x in itr
         val = @next(rf, val, x)
     end
-    return val
+    return complete(rf, val)
 end
 
 function __fold__(::IterateFold, rf0::RF, init::T, itr, ::SIMDEx) where {RF, T}
@@ -41,13 +41,13 @@ function __fold__(::IterateFold, rf0::RF, init::T, itr, ::SIMDEx) where {RF, T}
     @unroll_simd 8 for i in eachindex(itr)
         val = @next(rf, val, i)
     end
-    return val
+    return complete(rf, val)
 end
 
 
 function __fold__(::RecursiveFold, rf::RF, val::T, itr::Itr, ex::Union{SequentialEx, SIMDEx}) where {RF, T, Itr}
     if isempty(itr)
-        val
+        return complete(rf, val)
     else
         x, rest = front(itr), tail(itr)
         val′ = @next(rf, val, x)
@@ -65,10 +65,11 @@ function __fold__(rf0::RF, init::T, itr, ex::ChunkedEx) where {RF, T}
         rf = Map(getvalue)'(rf0)
         __fold__(rf, init, inds, ex.inner_ex)
     end
-    rf_outer = xf'((l, r) -> combine(rf0, l, r))
+    rf_outer = xf'() do l, r
+        combine(rf0, l, r)
+    end
     __fold__(rf_outer, init, index_chunks(itr; n=nchunks, split, minsize), SequentialEx())
 end
-
 
 
 #----------------------------------------------------------------
