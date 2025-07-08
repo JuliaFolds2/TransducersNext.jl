@@ -56,19 +56,14 @@ function __fold__(::RecursiveFold, rf::RF, val::T, itr::Itr, ex::Union{Sequentia
 end
 
 function __fold__(rf0::RF, init::T, itr, ex::ChunkedEx) where {RF, T}
-    (;nchunks, split, minsize) = ex
-    if length(itr) <= minsize
-        return __fold__(rf0, init, itr, ex.inner_ex)
-    end
-    xf = Map() do inds
-        @inline getvalue(I) = @inbounds itr[I]
-        rf = Map(getvalue)'(rf0)
-        __fold__(rf, init, inds, ex.inner_ex)
+    (;inner_ex, nchunks, chunksize, split, minsize) = ex
+    xf = Map() do chunk
+        __fold__(rf0, init, chunk, ex.inner_ex)
     end
     rf_outer = xf'() do l, r
         combine(rf0, l, r)
     end
-    __fold__(rf_outer, init, index_chunks(itr; n=nchunks, split, minsize), SequentialEx())
+    __fold__(rf_outer, init, chunks(itr; n=nchunks, size=chunksize, split, minsize), SequentialEx())
 end
 
 

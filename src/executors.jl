@@ -40,11 +40,12 @@ struct SIMDEx <: Executor end
 
 
 
-Base.@kwdef struct ChunkedEx{InnerEx <: Executor, NC, SP} <: Executor
+Base.@kwdef struct ChunkedEx{InnerEx <: Executor, NC, CS, SP} <: Executor
     inner_ex::InnerEx = SIMDEx()
-    nchunks::NC
+    nchunks::NC=nothing
+    chunksize::CS=nothing
     split::SP = Consecutive()
-    minsize::Int = 1
+    minsize::Union{Int, Nothing} = nothing
 end
 ChunkedEx(inner_ex; kwargs...) = ChunkedEx(;inner_ex, kwargs...)
 
